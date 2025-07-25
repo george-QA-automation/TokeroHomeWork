@@ -1,0 +1,75 @@
+# Ignore Visual Studio and Rider files
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Ignore build outputs
+bin/
+obj/
+[Bb]uild/
+[Bb]uilds/
+
+# User-specific files
+*.userprefs
+
+# Rider-specific settings and folders
+.idea/
+*.iml
+out/
+
+# .NET-related files
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.dll
+*.exe
+*.app
+*.pdb
+*.cache
+*.ilk
+*.ilk
+*.log
+*.vspscc
+*.vssscc
+*.tmp
+*.ide
+*.suo
+
+# .NET MAUI specific files
+*/App_Resources/Android/bin/
+*/App_Resources/Android/obj/
+*/App_Resources/iOS/bin/
+*/App_Resources/iOS/obj/
+
+# macOS related files
+*.DS_Store
+
+# Log, temporary, and debug files
+*.log
+*.tlog
+*.vscode/
+*.env
+
+# Dependency directories
+node_modules/
+npm-debug.log*
+
+# Package-related files
+*.nupkg
+*.snupkg
+packages/
+Nuget.exe
+
+# JetBrains Rider specific cache folders
+.idea/
+.idea_modules/
+
+# Backup and temporary files
+*.bak
+*.swp
+*.tmp
+*.temp
+~$*
