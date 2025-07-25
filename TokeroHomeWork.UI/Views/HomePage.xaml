@@ -2,8 +2,29 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:templates="clr-namespace:TokeroHomeWork.UI.Templates"
+             xmlns:viewModels="clr-namespace:TokeroHomeWork.Application.ViewModels;assembly=TokeroHomeWork.Application"
              x:Class="TokeroHomeWork.Views.HomePage">
-    <ContentPage.Content>
-        
-    </ContentPage.Content>
+
+    <ContentPage.BindingContext>
+        <viewModels:HomePageViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="Auto,*" Padding="20">
+        <Label Grid.Row="0" 
+               Text="{Binding Title}" 
+               FontSize="24" 
+               FontAttributes="Bold" 
+               HorizontalOptions="Center"
+               Margin="0,20,0,20" />
+        <CollectionView Grid.Row="1" 
+                        ItemsSource="{Binding CryptoItems}"
+                        SelectionMode="None">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <templates:CryptoItemTemplate />
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
 </ContentPage>

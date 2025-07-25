@@ -39,6 +39,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\TokeroHomeWork.Application\TokeroHomeWork.Application.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <!-- App Icon -->
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4"/>
 
