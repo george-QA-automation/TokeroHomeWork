@@ -1,4 +1,4 @@
-﻿namespace TokeroHomeWork;
+﻿namespace TokeroHomeWork.UI;
 
 public partial class AppShell : Shell
 {
