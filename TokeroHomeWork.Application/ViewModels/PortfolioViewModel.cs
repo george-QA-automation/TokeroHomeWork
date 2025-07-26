@@ -4,45 +4,66 @@ using TokeroHomeWork.Application.Models;
 
 namespace TokeroHomeWork.Application.ViewModels;
 
-public partial class PortfolioViewModel : ObservableObject
+public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
 {
     public ObservableCollection<InvestmentRecord> InvestmentRecords { get; } = new();
 
     public PortfolioViewModel()
     {
-        Initialize();
+        
+    }
+    
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        if (query != null && query.Count > 0)
+        {
+            if (query.TryGetValue("cryptoName", out var cryptoNameObj) &&
+                query.TryGetValue("startDate", out var startDateObj) &&
+                query.TryGetValue("dayOfTheMonth", out var dayOfMonthObj) &&
+                query.TryGetValue("amountPerMonth", out var amountObj))
+            {
+                string cryptoName = cryptoNameObj?.ToString();
+                DateTime startDate = startDateObj is DateTime date ? date : DateTime.Now;
+                int dayOfMonth = dayOfMonthObj is int day ? day : 
+                    (int.TryParse(dayOfMonthObj?.ToString(), out int parsedDay) ? parsedDay : 1);
+                decimal amount = amountObj is decimal amt ? amt :
+                    (decimal.TryParse(amountObj?.ToString(), out decimal parsedAmt) ? parsedAmt : 0);
+                
+                var records = SetInvestmentRecords(cryptoName, startDate, dayOfMonth, amount);
+                foreach (var record in records)
+                {
+                    InvestmentRecords.Add(record);
+                }
+            }
+        }
     }
 
-    private void Initialize()
+    private ObservableCollection<InvestmentRecord> SetInvestmentRecords(string cryptoName, DateTime startDate, int dayOfMonth, decimal amount)
     {
-        InvestmentRecords.Add(new InvestmentRecord
-        {
-            Date = DateTime.Now.AddDays(-30),
-            InvestedAmount = 1000,
-            CryptoAmount = 0.05m,
-            CryptoName = "BTC",
-            ValueToday = 1200,
-            ROI = 20
-        });
+        DateTime currentDate = new DateTime(startDate.Year, startDate.Month, dayOfMonth);
+        DateTime today = DateTime.Today;
+        int recordCount = 0;
 
-        InvestmentRecords.Add(new InvestmentRecord
-        {
-            Date = DateTime.Now.AddDays(-60),
-            InvestedAmount = 500,
-            CryptoAmount = 0.025m,
-            CryptoName = "ETH",
-            ValueToday = 650,
-            ROI = 30
-        });
+        ObservableCollection<InvestmentRecord> records = new();
 
-        InvestmentRecords.Add(new InvestmentRecord
+        while (currentDate <= today)
         {
-            Date = DateTime.Now.AddDays(-90),
-            InvestedAmount = 2000,
-            CryptoAmount = 0.1m,
-            CryptoName = "ADA",
-            ValueToday = 2400,
-            ROI = 20
-        });
+            var investmentRecord = new InvestmentRecord
+            {
+                Date = currentDate,
+                CryptoName = cryptoName,
+                InvestedAmount = amount,
+                CryptoAmount = 0.05m,
+                ValueToday = 1000,
+                ROI = 20
+            };
+
+            records.Add(investmentRecord);
+                    
+            recordCount++;
+            currentDate = currentDate.AddMonths(1);
+        }
+        
+        return records;
     }
 }
