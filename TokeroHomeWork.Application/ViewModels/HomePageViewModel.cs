@@ -6,7 +6,7 @@ namespace TokeroHomeWork.Application.ViewModels;
 
 public partial class HomePageViewModel : ObservableObject
 {
-    public ObservableCollection<CryptoItem> CryptoItems { get; set; }
+    public ObservableCollection<CryptoItemViewModel> CryptoItems { get; } = new();
 
     public HomePageViewModel()
     {
@@ -16,24 +16,29 @@ public partial class HomePageViewModel : ObservableObject
 
     private void Initialize()
     {
-        CryptoItems = new ObservableCollection<CryptoItem>
+        CryptoItems.Add(new CryptoItemViewModel
         {
-            new CryptoItem
-            {
-                CryptoName = "Bitcoin",
-                Value = 25000.00m
-            },
-            new CryptoItem
-            {
-                CryptoName = "Ethereum",
-                Value = 3500.00m
-            },
-            new CryptoItem
-            {
-                CryptoName = "Solana",
-                Value = 140.00m
-            }
-        };
+            CryptoName = "Bitcoin",
+            Value = 50000.00m
+        });
+
+        CryptoItems.Add(new CryptoItemViewModel
+        {
+            CryptoName = "Ethereum",
+            Value = 3000.00m
+        });
+
+        CryptoItems.Add(new CryptoItemViewModel
+        {
+            CryptoName = "Cardano",
+            Value = 2.50m
+        });
+
+        CryptoItems.Add(new CryptoItemViewModel
+        {
+            CryptoName = "Solana",
+            Value = 120.00m
+        });
     }
 
     [ObservableProperty] 

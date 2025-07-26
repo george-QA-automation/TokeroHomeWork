@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewModels="clr-namespace:TokeroHomeWork.Application.ViewModels;assembly=TokeroHomeWork.Application"
+             x:Class="TokeroHomeWork.UI.Templates.CryptoItemTemplate"
+             x:DataType="{x:Type viewModels:CryptoItemViewModel}">
+    <Frame Margin="0,5" Padding="15" BorderColor="LightGray" CornerRadius="10">
+        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
+            <Label Grid.Row="0" 
+                   Grid.Column="0"
+                   Text="{Binding CryptoName}" 
+                   FontSize="18" 
+                   FontAttributes="Bold" />
+            <Button Grid.Row="1"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Text="Invest"
+                    Margin="0,12,0,0"
+                    WidthRequest="150"
+                    HorizontalOptions="Start"
+                    Command="{Binding ExecuteInvestCommand}"/>
+            <Label Grid.Row="0"
+                   Grid.Column="1"
+                   Text="{Binding Value, StringFormat='${0:N2}'}" 
+                   FontSize="16" 
+                   FontAttributes="Bold" 
+                   HorizontalOptions="End"/>
+        </Grid>
+    </Frame>
+</ContentView>
