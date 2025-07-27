@@ -1,4 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
+using TokeroHomeWork.Application.Interfaces;
+using TokeroHomeWork.Application.Repositories;
+using TokeroHomeWork.Application.ViewModels;
+using TokeroHomeWork.Views;
 
 namespace TokeroHomeWork;
 
@@ -14,6 +18,16 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
+
+        builder.Services.AddSingleton<HttpClient>();
+        builder.Services.AddSingleton<ICryptoPricingRepository, CryptoPricingRepository>();
+        
+        builder.Services.AddTransient<PortfolioPage>();
+        builder.Services.AddTransient<HomePage>();
+        
+        builder.Services.AddTransient<PortfolioViewModel>();
+        builder.Services.AddTransient<HomePageViewModel>();
+
 
 #if DEBUG
         builder.Logging.AddDebug();

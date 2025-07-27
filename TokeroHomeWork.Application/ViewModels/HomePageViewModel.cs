@@ -1,44 +1,53 @@
 using System.Collections.ObjectModel;
 using TokeroHomeWork.Application.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
+using TokeroHomeWork.Application.Interfaces;
 
 namespace TokeroHomeWork.Application.ViewModels;
 
 public partial class HomePageViewModel : ObservableObject
 {
+    private readonly ICryptoPricingRepository _cryptoPricingRepository;
     public ObservableCollection<CryptoItemViewModel> CryptoItems { get; } = new();
 
-    public HomePageViewModel()
+    public HomePageViewModel(ICryptoPricingRepository cryptoPricingRepository)
     {
-        Initialize();
+        _cryptoPricingRepository = cryptoPricingRepository;
+        Initialize().GetAwaiter();
         Title = "Watchlist";
     }
 
-    private void Initialize()
+    private async Task Initialize()
     {
+        
         CryptoItems.Add(new CryptoItemViewModel
         {
             CryptoName = "Bitcoin",
-            Value = 50000.00m
+            Value = await GetCurrentPriceAsync("bitcoin")
         });
 
         CryptoItems.Add(new CryptoItemViewModel
         {
             CryptoName = "Ethereum",
-            Value = 3000.00m
+            Value = await GetCurrentPriceAsync("ethereum")
         });
 
         CryptoItems.Add(new CryptoItemViewModel
         {
             CryptoName = "Cardano",
-            Value = 2.50m
+            Value = await GetCurrentPriceAsync("cardano")
         });
 
         CryptoItems.Add(new CryptoItemViewModel
         {
             CryptoName = "Solana",
-            Value = 120.00m
+            Value = await GetCurrentPriceAsync("solana")
         });
+    }
+
+    private async Task<decimal?> GetCurrentPriceAsync(string cryptoName)
+    {
+        return await _cryptoPricingRepository.GetCurrentPriceAsync(cryptoName);
     }
 
     [ObservableProperty] 

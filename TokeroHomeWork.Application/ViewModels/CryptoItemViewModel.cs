@@ -133,7 +133,8 @@ namespace TokeroHomeWork.Application.ViewModels;
                     {"cryptoName", CryptoName},
                     {"startDate", tcs.Task.Result.date},
                     {"dayOfTheMonth", tcs.Task.Result.dayOfMonth},
-                    {"amountPerMonth", tcs.Task.Result.amount}
+                    {"amountPerMonth", tcs.Task.Result.amount},
+                    {"cryptoValue", Value}
                 };
                 await Shell.Current.GoToAsync("//Portfolio", navigationParameters);
             }
@@ -143,5 +144,5 @@ namespace TokeroHomeWork.Application.ViewModels;
         private string _cryptoName;
 
         [ObservableProperty]
-        private decimal _value;
+        private decimal? _value;
     }

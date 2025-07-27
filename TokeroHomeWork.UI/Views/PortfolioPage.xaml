@@ -3,12 +3,9 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewModels="clr-namespace:TokeroHomeWork.Application.ViewModels;assembly=TokeroHomeWork.Application"
+             xmlns:models="clr-namespace:TokeroHomeWork.Application.Models;assembly=TokeroHomeWork.Application"
              x:Class="TokeroHomeWork.Views.PortfolioPage"
              Shell.NavBarIsVisible="False">
-
-    <ContentPage.BindingContext>
-        <viewModels:PortfolioViewModel />
-    </ContentPage.BindingContext>
 
     <Grid RowDefinitions="Auto,*" Padding="20">
         <Label Grid.Row="0" 
@@ -20,7 +17,7 @@
         <ListView Grid.Row="1" 
                   ItemsSource="{Binding InvestmentRecords}">
             <ListView.Header>
-                <Grid ColumnDefinitions="*,*,*,*,*" 
+                <Grid ColumnDefinitions="0.8*,*,*,1.1*,0.7*" 
                       Padding="10">
                     <Label Grid.Column="0" 
                            Text="Date" FontAttributes="Bold" />
@@ -35,22 +32,24 @@
                 </Grid>
             </ListView.Header>
             <ListView.ItemTemplate>
-                <DataTemplate>
-                    <ViewCell>
-                        <Grid RowDefinitions="*,*"
-                              ColumnDefinitions="*,*,*,*,*" 
+                <DataTemplate x:DataType="models:InvestmentRecord">
+                    <ViewCell Height="60">
+                        <Grid RowDefinitions="auto,auto"
+                              ColumnDefinitions="0.8*,*,*,1.1*,0.7*" 
                               Padding="10">
                             <Label Grid.Column="0"
                                    Grid.RowSpan="2"
                                    Text="{Binding Date, StringFormat='{0:MMMM dd}'}" />
                             <Label Grid.Column="1"
                                    Grid.RowSpan="2"
-                                   Text="{Binding InvestedAmount, StringFormat='{0:N2}'}" />
+                                   Text="{Binding InvestedAmount, StringFormat='{0:N0}'}" />
                             <Label Grid.Column="2" 
-                                   Grid.Row="0" 
+                                   Grid.Row="0"
+                                   LineBreakMode="TailTruncation"
                                    Text="{Binding CryptoName}"/>
                             <Label Grid.Column="2" 
                                    Grid.Row="1"
+                                   LineBreakMode="TailTruncation"
                                    Text="{Binding CryptoAmount, StringFormat='{0:N6}'}" />
                             <Label Grid.Column="3"
                                    Grid.RowSpan="2"

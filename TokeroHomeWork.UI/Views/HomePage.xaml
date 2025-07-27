@@ -4,11 +4,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:templates="clr-namespace:TokeroHomeWork.UI.Templates"
              xmlns:viewModels="clr-namespace:TokeroHomeWork.Application.ViewModels;assembly=TokeroHomeWork.Application"
-             x:Class="TokeroHomeWork.Views.HomePage">
-
-    <ContentPage.BindingContext>
-        <viewModels:HomePageViewModel />
-    </ContentPage.BindingContext>
+             x:Class="TokeroHomeWork.Views.HomePage"
+             x:DataType="{x:Type viewModels:HomePageViewModel}">
 
     <Grid RowDefinitions="Auto,*" Padding="20">
         <Label Grid.Row="0" 

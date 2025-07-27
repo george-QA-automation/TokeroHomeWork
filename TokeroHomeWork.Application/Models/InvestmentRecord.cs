@@ -6,6 +6,6 @@ public class InvestmentRecord
     public decimal InvestedAmount { get; set; }
     public decimal CryptoAmount { get; set; }
     public string CryptoName { get; set; }
-    public decimal ValueToday { get; set; }
+    public decimal? ValueToday { get; set; }
     public decimal ROI { get; set; }
 }
