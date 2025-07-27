@@ -2,65 +2,84 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:viewModels="clr-namespace:TokeroHomeWork.Application.ViewModels;assembly=TokeroHomeWork.Application"
              xmlns:models="clr-namespace:TokeroHomeWork.Application.Models;assembly=TokeroHomeWork.Application"
+             xmlns:microcharts="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
              x:Class="TokeroHomeWork.Views.PortfolioPage"
              Shell.NavBarIsVisible="False">
-
-    <Grid RowDefinitions="Auto,*" Padding="20">
-        <Label Grid.Row="0" 
-               Text="Portfolio" 
-               FontSize="24" 
-               FontAttributes="Bold" 
-               HorizontalOptions="Center"
-               Margin="0,20,0,20" />
-        <ListView Grid.Row="1" 
-                  ItemsSource="{Binding InvestmentRecords}">
-            <ListView.Header>
-                <Grid ColumnDefinitions="0.8*,*,*,1.1*,0.7*" 
-                      Padding="10">
-                    <Label Grid.Column="0" 
-                           Text="Date" FontAttributes="Bold" />
-                    <Label Grid.Column="1" 
-                           Text="Invested $" FontAttributes="Bold" />
-                    <Label Grid.Column="2" 
-                           Text="Crypto Amount" FontAttributes="Bold" />
-                    <Label Grid.Column="3" 
-                           Text="Value Today $" FontAttributes="Bold" />
-                    <Label Grid.Column="4" 
-                           Text="ROI %" FontAttributes="Bold" />
-                </Grid>
-            </ListView.Header>
-            <ListView.ItemTemplate>
-                <DataTemplate x:DataType="models:InvestmentRecord">
-                    <ViewCell Height="60">
-                        <Grid RowDefinitions="auto,auto"
-                              ColumnDefinitions="0.8*,*,*,1.1*,0.7*" 
-                              Padding="10">
-                            <Label Grid.Column="0"
-                                   Grid.RowSpan="2"
-                                   Text="{Binding Date, StringFormat='{0:MMMM dd}'}" />
-                            <Label Grid.Column="1"
-                                   Grid.RowSpan="2"
-                                   Text="{Binding InvestedAmount, StringFormat='{0:N0}'}" />
-                            <Label Grid.Column="2" 
-                                   Grid.Row="0"
-                                   LineBreakMode="TailTruncation"
-                                   Text="{Binding CryptoName}"/>
-                            <Label Grid.Column="2" 
-                                   Grid.Row="1"
-                                   LineBreakMode="TailTruncation"
-                                   Text="{Binding CryptoAmount, StringFormat='{0:N6}'}" />
-                            <Label Grid.Column="3"
-                                   Grid.RowSpan="2"
-                                   Text="{Binding ValueToday, StringFormat='{0:N2}'}" />
-                            <Label Grid.Column="4"
-                                   Grid.RowSpan="2"
-                                   Text="{Binding ROI, StringFormat='{0:F1}'}" />
-                        </Grid>
-                    </ViewCell>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-    </Grid>
+<RefreshView>
+       <Grid RowDefinitions="Auto,Auto,*" Padding="20">
+              <Label Grid.Row="0" 
+                     Text="Portfolio" 
+                     FontSize="24" 
+                     FontAttributes="Bold" 
+                     HorizontalOptions="Center"
+                     Margin="0,20,0,20" />
+              <Frame Grid.Row="1" 
+                     Margin="0,0,0,20"
+                     Padding="10"
+                     CornerRadius="10"
+                     BorderColor="LightGray"
+                     IsVisible="{Binding HasInvestmentRecords}">
+                     <Grid RowDefinitions="Auto,*">
+                            <Label Text="{Binding PortfolioChartTitle}" 
+                                   FontSize="16" 
+                                   FontAttributes="Bold" 
+                                   HorizontalOptions="Center"
+                                   Margin="0,0,0,10"/>
+                            <microcharts:ChartView Grid.Row="1"
+                                                   Chart="{Binding PerformanceChart}"
+                                                   HeightRequest="250"/>
+                     </Grid>
+              </Frame>
+              <ListView Grid.Row="2" 
+                        ItemsSource="{Binding InvestmentRecords}"
+                        SelectionMode="None">
+                     <ListView.Header>
+                            <Grid ColumnDefinitions="0.8*,*,*,1.1*,0.7*" 
+                                  Padding="10">
+                                   <Label Grid.Column="0" 
+                                          Text="Date" FontAttributes="Bold" />
+                                   <Label Grid.Column="1" 
+                                          Text="Invested $" FontAttributes="Bold" />
+                                   <Label Grid.Column="2" 
+                                          Text="Crypto Amount" FontAttributes="Bold" />
+                                   <Label Grid.Column="3" 
+                                          Text="Value Today $" FontAttributes="Bold" />
+                                   <Label Grid.Column="4" 
+                                          Text="ROI %" FontAttributes="Bold" />
+                            </Grid>
+                     </ListView.Header>
+                     <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:InvestmentRecord">
+                                   <ViewCell Height="60">
+                                          <Grid RowDefinitions="auto,auto"
+                                                ColumnDefinitions="0.8*,*,*,1.1*,0.7*" 
+                                                Padding="10">
+                                                 <Label Grid.Column="0"
+                                                        Grid.RowSpan="2"
+                                                        Text="{Binding Date, StringFormat='{0:MMMM dd}'}" />
+                                                 <Label Grid.Column="1"
+                                                        Grid.RowSpan="2"
+                                                        Text="{Binding InvestedAmount, StringFormat='{0:N2}'}" />
+                                                 <Label Grid.Column="2" 
+                                                        Grid.Row="0"
+                                                        LineBreakMode="TailTruncation"
+                                                        Text="{Binding CryptoName}"/>
+                                                 <Label Grid.Column="2" 
+                                                        Grid.Row="1"
+                                                        LineBreakMode="TailTruncation"
+                                                        Text="{Binding CryptoAmount, StringFormat='{0:N6}'}" />
+                                                 <Label Grid.Column="3"
+                                                        Grid.RowSpan="2"
+                                                        Text="{Binding ValueToday, StringFormat='{0:N2}'}" />
+                                                 <Label Grid.Column="4"
+                                                        Grid.RowSpan="2"
+                                                        Text="{Binding ROI, StringFormat='{0:F1}'}" />
+                                          </Grid>
+                                   </ViewCell>
+                            </DataTemplate>
+                     </ListView.ItemTemplate>
+              </ListView>
+       </Grid>
+</RefreshView>
 </ContentPage>
