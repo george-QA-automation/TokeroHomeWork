@@ -20,47 +20,63 @@
                      CornerRadius="10"
                      BorderColor="LightGray"
                      IsVisible="{Binding HasInvestmentRecords}">
-                     <Grid RowDefinitions="Auto,*">
-                            <Label Text="{Binding PortfolioChartTitle}" 
+                     <Grid RowDefinitions="Auto,Auto,*">
+                            <Label Grid.Row="0"
+                                   Text="{Binding PortfolioChartTitle}" 
                                    FontSize="16" 
                                    FontAttributes="Bold" 
-                                   HorizontalOptions="Center"
-                                   Margin="0,0,0,10"/>
-                            <microcharts:ChartView Grid.Row="1"
+                                   HorizontalOptions="Start"
+                                   Margin="10,0,0,0"/>
+                            <Label Grid.Row="1"
+                                   Text="{Binding PortfolioChartSubtitle}"
+                                   FontSize="16"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Start"
+                                   Margin="10"/>
+                            <microcharts:ChartView Grid.Row="2"
                                                    Chart="{Binding PerformanceChart}"
                                                    HeightRequest="250"/>
                      </Grid>
               </Frame>
               <ListView Grid.Row="2" 
-                        ItemsSource="{Binding InvestmentRecords}"
+                        ItemsSource="{Binding ProcessedInvestmentRecords}"
                         SelectionMode="None">
                      <ListView.Header>
-                            <Grid ColumnDefinitions="0.8*,*,*,1.1*,0.7*" 
-                                  Padding="10">
+                            <Grid ColumnDefinitions="0.8*,*,*,1.2*,0.7*" 
+                                  Padding="5">
                                    <Label Grid.Column="0" 
-                                          Text="Date" FontAttributes="Bold" />
+                                          Text="Date" FontAttributes="Bold" 
+                                          VerticalOptions="Center"/>
                                    <Label Grid.Column="1" 
-                                          Text="Invested $" FontAttributes="Bold" />
+                                          Text="Invested $" FontAttributes="Bold" 
+                                          VerticalOptions="Center"/>
                                    <Label Grid.Column="2" 
-                                          Text="Crypto Amount" FontAttributes="Bold" />
+                                          Text="Crypto Amount" FontAttributes="Bold" 
+                                          VerticalOptions="Center"/>
                                    <Label Grid.Column="3" 
-                                          Text="Value Today $" FontAttributes="Bold" />
+                                          Text="Value Today $" FontAttributes="Bold" 
+                                          VerticalOptions="Center"/>
                                    <Label Grid.Column="4" 
-                                          Text="ROI %" FontAttributes="Bold" />
+                                          Text="ROI %" FontAttributes="Bold" 
+                                          VerticalOptions="Center"/>
                             </Grid>
                      </ListView.Header>
                      <ListView.ItemTemplate>
                             <DataTemplate x:DataType="models:InvestmentRecord">
-                                   <ViewCell Height="60">
+                                   <ViewCell Height="70">
                                           <Grid RowDefinitions="auto,auto"
-                                                ColumnDefinitions="0.8*,*,*,1.1*,0.7*" 
+                                                ColumnDefinitions="0.8*,*,*,1.2*,0.7*" 
                                                 Padding="10">
                                                  <Label Grid.Column="0"
                                                         Grid.RowSpan="2"
-                                                        Text="{Binding Date, StringFormat='{0:MMMM dd}'}" />
+                                                        Text="{Binding Date, StringFormat='{0:dd MMM}'}" 
+                                                        HorizontalOptions="Start"
+                                                        VerticalOptions="Center"/>
                                                  <Label Grid.Column="1"
                                                         Grid.RowSpan="2"
-                                                        Text="{Binding InvestedAmount, StringFormat='{0:N2}'}" />
+                                                        Text="{Binding InvestedAmount, StringFormat='{0:N2}'}" 
+                                                        HorizontalOptions="Center"
+                                                        VerticalOptions="Center"/>
                                                  <Label Grid.Column="2" 
                                                         Grid.Row="0"
                                                         LineBreakMode="TailTruncation"
@@ -71,10 +87,13 @@
                                                         Text="{Binding CryptoAmount, StringFormat='{0:N6}'}" />
                                                  <Label Grid.Column="3"
                                                         Grid.RowSpan="2"
-                                                        Text="{Binding ValueToday, StringFormat='{0:N2}'}" />
+                                                        Text="{Binding ValueToday, StringFormat='{0:N2}'}" 
+                                                        HorizontalOptions="Center"
+                                                        VerticalOptions="Center"/>
                                                  <Label Grid.Column="4"
                                                         Grid.RowSpan="2"
-                                                        Text="{Binding ROI, StringFormat='{0:F1}'}" />
+                                                        Text="{Binding ROI, StringFormat='{0:F2}'}" 
+                                                        VerticalOptions="Center"/>
                                           </Grid>
                                    </ViewCell>
                             </DataTemplate>

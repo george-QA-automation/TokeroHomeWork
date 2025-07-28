@@ -20,7 +20,7 @@ namespace TokeroHomeWork.Application.Repositories
 
         }
 
-        public async Task<decimal?> GetHistoricalPriceAsync(string coinId, DateTime date)
+        public async Task<decimal> GetHistoricalPriceAsync(string coinId, DateTime date)
         {
             try
             {
@@ -54,12 +54,12 @@ namespace TokeroHomeWork.Application.Repositories
                     Console.WriteLine($"Error fetching historical price: {response.StatusCode}");
                 }
 
-                return null;
+                return 1;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception in GetHistoricalPriceAsync: {ex.Message}");
-                return null;
+                return 1;
             }
         }
 
