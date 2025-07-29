@@ -6,15 +6,22 @@
              xmlns:microcharts="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
              x:Class="TokeroHomeWork.Views.PortfolioPage"
              Shell.NavBarIsVisible="False">
-<RefreshView>
-       <Grid RowDefinitions="Auto,Auto,*" Padding="20">
+<RefreshView IsRefreshing="{Binding IsRefreshing}">
+       <ScrollView>
+             <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto,*" Padding="20">
               <Label Grid.Row="0" 
                      Text="Portfolio" 
                      FontSize="24" 
                      FontAttributes="Bold" 
                      HorizontalOptions="Center"
                      Margin="0,20,0,20" />
-              <Frame Grid.Row="1" 
+              <Label Grid.Row="1"
+                     Text="Investment over time"
+                     FontSize="20"
+                     HorizontalOptions="Start"
+                     Margin="0,0,0,10"
+                     IsVisible="{Binding HasInvestmentRecords}"/>
+              <Frame Grid.Row="2" 
                      Margin="0,0,0,20"
                      Padding="10"
                      CornerRadius="10"
@@ -23,13 +30,13 @@
                      <Grid RowDefinitions="Auto,Auto,*">
                             <Label Grid.Row="0"
                                    Text="{Binding PortfolioChartTitle}" 
-                                   FontSize="16" 
+                                   FontSize="14" 
                                    FontAttributes="Bold" 
                                    HorizontalOptions="Start"
                                    Margin="10,0,0,0"/>
                             <Label Grid.Row="1"
                                    Text="{Binding PortfolioChartSubtitle}"
-                                   FontSize="16"
+                                   FontSize="14"
                                    FontAttributes="Bold"
                                    HorizontalOptions="Start"
                                    Margin="10"/>
@@ -38,26 +45,107 @@
                                                    HeightRequest="250"/>
                      </Grid>
               </Frame>
-              <ListView Grid.Row="2" 
+              <Label Grid.Row="3"
+                     Text="Crypto holdings"
+                     FontSize="20"
+                     HorizontalOptions="Start"
+                     Margin="0,0,0,10"
+                     IsVisible="{Binding HasInvestmentRecords}"/>
+              <ListView Grid.Row="4" 
+                        ItemsSource="{Binding CryptoSummaries}"
+                        SelectionMode="None"
+                        IsVisible="{Binding HasInvestmentRecords}"
+                        Margin="0,0,0,20">
+                     <ListView.Header>
+                            <Grid ColumnDefinitions="*,*,1.2*,1.1*" 
+                                  Padding="5">
+                                   <Label Grid.Column="0" 
+                                          Text="Name" 
+                                          FontAttributes="Bold" 
+                                          HorizontalOptions="Center"/>
+                                   <Label Grid.Column="1" 
+                                          Text="Amount" 
+                                          FontAttributes="Bold" 
+                                          HorizontalOptions="Center"/>
+                                   <Label Grid.Column="2" 
+                                          Text="Amount in BTC"
+                                          FontAttributes="Bold" 
+                                          HorizontalOptions="Center"/>
+                                   <Label Grid.Column="3" 
+                                          Text="Value Today €" 
+                                          FontAttributes="Bold" 
+                                          HorizontalOptions="Center"/>
+                            </Grid>
+                     </ListView.Header>
+                     <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:CryptoSummary">
+                                   <ViewCell Height="70">
+                                          <Grid ColumnDefinitions="*,*,1.2*,1.1*" 
+                                                Padding="10">
+                                                 <Label Grid.Column="0"
+                                                        Text="{Binding CryptoName}" 
+                                                        HorizontalOptions="Start"
+                                                        VerticalOptions="Center"/>
+                                                 <Label Grid.Column="1"
+                                                        Text="{Binding Amount, StringFormat='{0:N6}'}" 
+                                                        HorizontalOptions="Center"
+                                                        VerticalOptions="Center"/>
+                                                 <Label Grid.Column="2" 
+                                                        LineBreakMode="TailTruncation"
+                                                        Text="{Binding AmountInBTC, StringFormat='{0:N6}'}"
+                                                        HorizontalOptions="Center"/>
+                                                 <Label Grid.Column="3"
+                                                        LineBreakMode="TailTruncation"
+                                                        Text="{Binding TotalValue, StringFormat='{0:N2}'}"
+                                                        HorizontalOptions="Center"/>
+                                          </Grid>
+                                   </ViewCell>
+                            </DataTemplate>
+                     </ListView.ItemTemplate>
+              </ListView>
+              <Frame Grid.Row="5" 
+                     Margin="0,0,0,20"
+                     Padding="10"
+                     CornerRadius="10"
+                     BorderColor="LightGray"
+                     IsVisible="{Binding HasInvestmentRecords}">
+                     <Grid RowDefinitions="*">
+                            <microcharts:ChartView Grid.Row="2"
+                                                   Chart="{Binding DonutChart}"
+                                                   HeightRequest="250"/>
+                     </Grid>
+              </Frame>
+              <Label Grid.Row="6"
+                     Text="Monthly recap"
+                     FontSize="20"
+                     HorizontalOptions="Start"
+                     Margin="0,0,0,10"/>
+              <ListView Grid.Row="7" 
                         ItemsSource="{Binding ProcessedInvestmentRecords}"
-                        SelectionMode="None">
+                        SelectionMode="None"
+                        Margin="0,0,0,20">
                      <ListView.Header>
                             <Grid ColumnDefinitions="0.8*,*,*,1.2*,0.7*" 
                                   Padding="5">
                                    <Label Grid.Column="0" 
-                                          Text="Date" FontAttributes="Bold" 
+                                          Text="Date" 
+                                          FontAttributes="Bold" 
                                           VerticalOptions="Center"/>
                                    <Label Grid.Column="1" 
-                                          Text="Invested $" FontAttributes="Bold" 
+                                          Text="Invested €" 
+                                          FontAttributes="Bold" 
                                           VerticalOptions="Center"/>
                                    <Label Grid.Column="2" 
-                                          Text="Crypto Amount" FontAttributes="Bold" 
+                                          Text="Crypto Amount" 
+                                          FontAttributes="Bold" 
                                           VerticalOptions="Center"/>
                                    <Label Grid.Column="3" 
-                                          Text="Value Today $" FontAttributes="Bold" 
+                                          Text="Value Today €" 
+                                          FontAttributes="Bold" 
                                           VerticalOptions="Center"/>
                                    <Label Grid.Column="4" 
-                                          Text="ROI %" FontAttributes="Bold" 
+                                          Text="ROI %" 
+                                          FontAttributes="Bold" 
                                           VerticalOptions="Center"/>
                             </Grid>
                      </ListView.Header>
@@ -99,6 +187,7 @@
                             </DataTemplate>
                      </ListView.ItemTemplate>
               </ListView>
-       </Grid>
+       </Grid> 
+       </ScrollView>
 </RefreshView>
 </ContentPage>

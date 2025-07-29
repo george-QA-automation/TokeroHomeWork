@@ -19,35 +19,34 @@ public partial class HomePageViewModel : ObservableObject
 
     private async Task Initialize()
     {
-        
         CryptoItems.Add(new CryptoItemViewModel
         {
             CryptoName = "Bitcoin",
-            Value = await GetCurrentPriceAsync("bitcoin")
+            Value = await GetCurrentPriceAsync("bitcoin", "eur")
         });
 
         CryptoItems.Add(new CryptoItemViewModel
         {
             CryptoName = "Ethereum",
-            Value = await GetCurrentPriceAsync("ethereum")
+            Value = await GetCurrentPriceAsync("ethereum", "eur")
         });
 
         CryptoItems.Add(new CryptoItemViewModel
         {
             CryptoName = "Cardano",
-            Value = await GetCurrentPriceAsync("cardano")
+            Value = await GetCurrentPriceAsync("cardano", "eur")
         });
 
         CryptoItems.Add(new CryptoItemViewModel
         {
             CryptoName = "Solana",
-            Value = await GetCurrentPriceAsync("solana")
+            Value = await GetCurrentPriceAsync("solana", "eur")
         });
     }
 
-    private async Task<decimal?> GetCurrentPriceAsync(string cryptoName)
+    private async Task<decimal?> GetCurrentPriceAsync(string cryptoName, string currency)
     {
-        return await _cryptoPricingRepository.GetCurrentPriceAsync(cryptoName);
+        return await _cryptoPricingRepository.GetCurrentPriceAsync(cryptoName, currency);
     }
 
     [ObservableProperty] 

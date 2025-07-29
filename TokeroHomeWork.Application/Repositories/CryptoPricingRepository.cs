@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Net.Http;
 using System.Text.Json;
@@ -51,26 +52,26 @@ namespace TokeroHomeWork.Application.Repositories
                 }
                 else
                 {
-                    Console.WriteLine($"Error fetching historical price: {response.StatusCode}");
+                    Debug.WriteLine($"Error fetching historical price: {response.StatusCode}");
                 }
 
                 return 1;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception in GetHistoricalPriceAsync: {ex.Message}");
+                Debug.WriteLine($"Exception in GetHistoricalPriceAsync: {ex.Message}");
                 return 1;
             }
         }
 
-        public async Task<decimal?> GetCurrentPriceAsync(string coinId)
+        public async Task<decimal?> GetCurrentPriceAsync(string coinId, string currency)
         {
             try
             {
                 var request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Get,
-                    RequestUri = new Uri($"https://api.coingecko.com/api/v3/simple/price?vs_currencies=eur&ids={coinId}"),
+                    RequestUri = new Uri($"https://api.coingecko.com/api/v3/simple/price?vs_currencies={currency}&ids={coinId}"),
                     Headers =
                     {
                         { "accept", "application/json" },
@@ -87,7 +88,7 @@ namespace TokeroHomeWork.Application.Repositories
                     using JsonDocument doc = JsonDocument.Parse(content);
                 
                     if (doc.RootElement.TryGetProperty(coinId, out JsonElement coinElement) &&
-                        coinElement.TryGetProperty("eur", out JsonElement eurElement))
+                        coinElement.TryGetProperty(currency, out JsonElement eurElement))
                     {
                         if (eurElement.ValueKind == JsonValueKind.Number)
                         {
@@ -97,14 +98,14 @@ namespace TokeroHomeWork.Application.Repositories
                 }
                 else
                 {
-                    Console.WriteLine($"Error fetching current price: {response.StatusCode}");
+                    Debug.WriteLine($"Error fetching current price: {response.StatusCode}");
                 }
 
                 return null;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception in GetCurrentPriceAsync: {ex.Message}");
+                Debug.WriteLine($"Exception in GetCurrentPriceAsync: {ex.Message}");
                 return null;
             }
         }

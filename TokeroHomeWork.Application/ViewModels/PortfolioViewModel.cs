@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microcharts;
 using SkiaSharp;
@@ -12,6 +13,7 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
     private ICryptoPricingRepository _cryptoPricingRepository;
     public ObservableCollection<InvestmentRecord> InvestmentRecords { get; } = new();
     public ObservableCollection<InvestmentRecord> ProcessedInvestmentRecords { get; } = new();
+    public ObservableCollection<CryptoSummary> CryptoSummaries { get; } = new();
 
     public PortfolioViewModel(ICryptoPricingRepository cryptoPricingRepository)
     {
@@ -33,20 +35,35 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
                 int dayOfMonth = Convert.ToInt32(dayOfMonthObj);
                 decimal amount = Convert.ToDecimal(amountObj);
                 decimal currentValue = Convert.ToDecimal(cryptoValueObj);
+
+                try
+                {
+                    IsRefreshing = true;
+                    HasInvestmentRecords = false;
+                    PerformanceChart = null;
+                    DonutChart = null;
+
+                    var records = await SetInvestmentRecords(cryptoName, startDate, dayOfMonth, amount, currentValue);
+                    foreach (var record in records)
+                    {
+                        InvestmentRecords.Add(record);
+                    }
+
+                    HasInvestmentRecords = InvestmentRecords.Count > 0;
+
+                    if (HasInvestmentRecords)
+                    {
+                        CalculatePortfolioProgress();
+                        await CalculateCryptoSummary();
+                        GeneratePerformanceChart();
+                        GenerateCryptoHoldingsChart();
+                    }
+                }
+                finally
+                {
+                    IsRefreshing = false;
+                }
                 
-                var records = await SetInvestmentRecords(cryptoName, startDate, dayOfMonth, amount, currentValue);
-                foreach (var record in records)
-                {
-                    InvestmentRecords.Add(record);
-                }
-
-                HasInvestmentRecords = InvestmentRecords.Count > 0;
-
-                if (HasInvestmentRecords)
-                {
-                    CalculatePortfolioProgress();
-                    GeneratePerformanceChart();
-                }
             }
         }
     }
@@ -113,10 +130,33 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
             }
         }
     }
-    
-    private async Task<decimal> GetHistoricalPriceAsync(string cryptoName, DateTime date)
+
+    private async Task CalculateCryptoSummary()
     {
-        return await _cryptoPricingRepository.GetHistoricalPriceAsync(cryptoName.ToLower(),date);
+        CryptoSummaries.Clear();
+    
+        var cryptoGroups = ProcessedInvestmentRecords
+            .GroupBy(r => r.CryptoName)
+            .Select(group => group.OrderBy(r => r.Date).Last())
+            .ToList();
+
+        foreach (var crypto in cryptoGroups)
+        {
+            var cryptoName = crypto.CryptoName.ToLower();
+            var priceInBtc = await GetCurrentPriceAsync(cryptoName, "btc");
+            var amountInBtc = priceInBtc * crypto.CryptoAmount;
+            
+            var summary = new CryptoSummary
+            {
+                CryptoName = crypto.CryptoName,
+                Amount = crypto.CryptoAmount,
+                TotalValue = crypto.CryptoAmount * crypto.ValueToday,
+                AmountInBTC = amountInBtc
+            };
+            
+            CryptoSummaries.Add(summary);
+        }
+
     }
 
     private decimal CalculateCryptoAmount(decimal investedAmount, decimal? value)
@@ -144,8 +184,6 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
             Color = lineColor,
             TextColor = lineColor
         };
-        entries.Add(emptyEntry);
-        entries.Add(emptyEntry);
         entries.Add(emptyEntry);
 
         var groupedRecords = ProcessedInvestmentRecords.GroupBy(r => r.Date.Month).ToList();
@@ -184,8 +222,8 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
             totalPotfolioInvestment += coin.InvestedAmount;
         }
         TotalROI = (totalPortfolioValue - totalPotfolioInvestment) / totalPotfolioInvestment * 100;
-        PortfolioChartTitle = $"Total value: ${totalPortfolioValue:N2}";
-        PortfolioChartSubtitle = $"Total investment: ${totalPotfolioInvestment:N2} ROI: {TotalROI:F2}%";
+        PortfolioChartTitle = $"Total value: {totalPortfolioValue:N2} €";
+        PortfolioChartSubtitle = $"Total investment: {totalPotfolioInvestment:N2} € ROI: {TotalROI:F2}%";
 
         var newChart = new LineChart
         {
@@ -206,9 +244,66 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
         };
         PerformanceChart = newChart;
     }
+    
+    private void GenerateCryptoHoldingsChart()
+    {
+        var entries = new List<ChartEntry>();
+        
+        var coinColors = new Dictionary<string, SKColor>
+        {
+            { "bitcoin", SKColor.Parse("#F7931A") },   // Orange
+            { "ethereum", SKColor.Parse("#627EEA") },  // Blue
+            { "solana", SKColor.Parse("#00FFA3") },    // Green
+        };
+        
+        var lastRecordPerCoin = ProcessedInvestmentRecords
+            .GroupBy(r => r.CryptoName)
+            .Select(group => group.OrderBy(r => r.Date).Last())
+            .ToList();
+
+        foreach (var coin in lastRecordPerCoin)
+        {
+            var coinValueToday = coin.CryptoAmount * coin.ValueToday;
+            var color = coinColors[coin.CryptoName.ToLower()];
+            var entry = new ChartEntry((float)coinValueToday)
+            {
+                Label = coin.CryptoName,
+                ValueLabel = $"{coinValueToday:N2} €",
+                Color = color,
+                TextColor = color
+            };
+            entries.Add(entry);
+        }
+        
+        var donutChart = new DonutChart
+        {
+            Entries = entries,
+            LabelTextSize = 30,
+            LabelMode = LabelMode.RightOnly,
+            BackgroundColor = SKColors.Empty,
+            HoleRadius = 0.5f,
+            IsAnimated = false
+        };
+    
+        DonutChart = donutChart;
+    }
+    
+    private async Task<decimal> GetHistoricalPriceAsync(string cryptoName, DateTime date)
+    {
+        return await _cryptoPricingRepository.GetHistoricalPriceAsync(cryptoName.ToLower(),date);
+    }
+    
+    private async Task<decimal?> GetCurrentPriceAsync(string cryptoName, string currency)
+    {
+        return await _cryptoPricingRepository.GetCurrentPriceAsync(cryptoName, currency);
+    }
+
 
     [ObservableProperty]
     private LineChart _performanceChart;
+    
+    [ObservableProperty]
+    private DonutChart _donutChart;
 
     [ObservableProperty]
     private bool _hasInvestmentRecords;
@@ -221,4 +316,7 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
 
     [ObservableProperty] 
     private decimal _totalROI;
+
+    [ObservableProperty] 
+    private bool _isRefreshing;
 }
