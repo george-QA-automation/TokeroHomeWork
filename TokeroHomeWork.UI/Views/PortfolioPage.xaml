@@ -4,11 +4,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:TokeroHomeWork.Application.Models;assembly=TokeroHomeWork.Application"
              xmlns:microcharts="clr-namespace:Microcharts.Maui;assembly=Microcharts.Maui"
+             xmlns:converters="clr-namespace:TokeroHomeWork.Converters"
+             xmlns:viewModels="clr-namespace:TokeroHomeWork.Application.ViewModels;assembly=TokeroHomeWork.Application"
              x:Class="TokeroHomeWork.Views.PortfolioPage"
-             Shell.NavBarIsVisible="False">
-<RefreshView IsRefreshing="{Binding IsRefreshing}">
-       <ScrollView>
-             <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto,*" Padding="20">
+             Shell.NavBarIsVisible="False"
+             x:DataType="{x:Type viewModels:PortfolioViewModel}">
+<ScrollView>
+       <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto,*" 
+             Padding="20">
               <Label Grid.Row="0" 
                      Text="Portfolio" 
                      FontSize="24" 
@@ -21,6 +24,17 @@
                      HorizontalOptions="Start"
                      Margin="0,0,0,10"
                      IsVisible="{Binding HasInvestmentRecords}"/>
+              <Image Grid.Row="1"
+                     Source="clear"
+                      Margin="0,0,0,10"
+                      WidthRequest="60"
+                      HeightRequest="20"
+                      HorizontalOptions="End"
+                      IsVisible="{Binding HasInvestmentRecords}">
+                     <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ClearPortfolioCommand}"/>
+                     </Image.GestureRecognizers>
+              </Image>
               <Frame Grid.Row="2" 
                      Margin="0,0,0,20"
                      Padding="10"
@@ -57,7 +71,7 @@
                         IsVisible="{Binding HasInvestmentRecords}"
                         Margin="0,0,0,20">
                      <ListView.Header>
-                            <Grid ColumnDefinitions="*,*,1.2*,1.1*" 
+                            <Grid ColumnDefinitions="*,*,1.2*,1.2*" 
                                   Padding="5">
                                    <Label Grid.Column="0" 
                                           Text="Name" 
@@ -80,16 +94,14 @@
                      <ListView.ItemTemplate>
                             <DataTemplate x:DataType="models:CryptoSummary">
                                    <ViewCell Height="70">
-                                          <Grid ColumnDefinitions="*,*,1.2*,1.1*" 
+                                          <Grid ColumnDefinitions="*,*,1.2*,1.2*" 
                                                 Padding="10">
                                                  <Label Grid.Column="0"
                                                         Text="{Binding CryptoName}" 
-                                                        HorizontalOptions="Start"
-                                                        VerticalOptions="Center"/>
+                                                        HorizontalOptions="Start"/>
                                                  <Label Grid.Column="1"
                                                         Text="{Binding Amount, StringFormat='{0:N6}'}" 
-                                                        HorizontalOptions="Center"
-                                                        VerticalOptions="Center"/>
+                                                        HorizontalOptions="Center"/>
                                                  <Label Grid.Column="2" 
                                                         LineBreakMode="TailTruncation"
                                                         Text="{Binding AmountInBTC, StringFormat='{0:N6}'}"
@@ -119,11 +131,13 @@
                      Text="Monthly recap"
                      FontSize="20"
                      HorizontalOptions="Start"
-                     Margin="0,0,0,10"/>
+                     Margin="0,0,0,10"
+                     IsVisible="{Binding HasInvestmentRecords}"/>
               <ListView Grid.Row="7" 
                         ItemsSource="{Binding ProcessedInvestmentRecords}"
                         SelectionMode="None"
-                        Margin="0,0,0,20">
+                        Margin="0,0,0,20"
+                        IsVisible="{Binding HasInvestmentRecords}">
                      <ListView.Header>
                             <Grid ColumnDefinitions="0.8*,*,*,1.2*,0.7*" 
                                   Padding="5">
@@ -187,7 +201,33 @@
                             </DataTemplate>
                      </ListView.ItemTemplate>
               </ListView>
+              
+              <!-- Empty View / Loading -->
+              <Label Grid.Row="5"
+                     Text="No investments yet"
+                     FontSize="16"
+                     FontAttributes="Bold"
+                     HorizontalOptions="Center"
+                     VerticalOptions="Center"
+                     IsVisible="{Binding HasInvestmentRecords, Converter={converters:NotConverter}}"
+                     Margin="10">
+                     <Label.Triggers>
+                            <DataTrigger TargetType="Label"
+                                         Binding="{Binding IsLoading, Mode=OneWay}"
+                                         Value="True">
+                                   <DataTrigger.Setters>
+                                          <Setter Property="Text"
+                                                  Value="Loading..." />
+                                   </DataTrigger.Setters>
+                            </DataTrigger>
+                     </Label.Triggers>
+              </Label>
+              <ActivityIndicator Grid.Row="6"
+                                 IsVisible="{Binding IsLoading}"
+                                 IsRunning="{Binding IsLoading}"
+                                 Color="Black"
+                                 HorizontalOptions="Center"
+                                 VerticalOptions="Center"/>
        </Grid> 
-       </ScrollView>
-</RefreshView>
+</ScrollView>
 </ContentPage>

@@ -4,25 +4,40 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:templates="clr-namespace:TokeroHomeWork.UI.Templates"
              xmlns:viewModels="clr-namespace:TokeroHomeWork.Application.ViewModels;assembly=TokeroHomeWork.Application"
+             xmlns:converters="clr-namespace:TokeroHomeWork.Converters"
              x:Class="TokeroHomeWork.Views.HomePage"
              x:DataType="{x:Type viewModels:HomePageViewModel}"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="Auto,*" Padding="20">
+    <Grid RowDefinitions="Auto,Auto,*" Padding="20">
         <Label Grid.Row="0" 
                Text="{Binding Title}" 
                FontSize="24" 
                FontAttributes="Bold" 
                HorizontalOptions="Center"
                Margin="0,20,0,20" />
-        <CollectionView Grid.Row="1" 
+        <Button Grid.Row="1"
+                Text="Bulk Invest"
+                Margin="0,0,0,10"
+                WidthRequest="100"
+                HorizontalOptions="Start"
+                Command="{Binding BulkInvestCommand}"
+                IsVisible="{Binding IsLoading, Converter={converters:NotConverter}}"/>
+        <CollectionView Grid.Row="2" 
                         ItemsSource="{Binding CryptoItems}"
-                        SelectionMode="None">
+                        SelectionMode="Multiple"
+                        IsVisible="{Binding IsLoading, Converter={converters:NotConverter}}">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <templates:CryptoItemTemplate />
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
+        <ActivityIndicator Grid.Row="2"
+                           IsVisible="{Binding IsLoading}"
+                           IsRunning="{Binding IsLoading}"
+                           Color="Black"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
     </Grid>
 </ContentPage>

@@ -5,7 +5,7 @@
              xmlns:viewModels="clr-namespace:TokeroHomeWork.Application.ViewModels;assembly=TokeroHomeWork.Application"
              x:Class="TokeroHomeWork.UI.Templates.CryptoItemTemplate"
              x:DataType="{x:Type viewModels:CryptoItemViewModel}">
-    <Frame Margin="0,5" Padding="15" BorderColor="LightGray" CornerRadius="10">
+    <Frame Margin="0,5" Padding="10" BorderColor="LightGray" CornerRadius="10">
         <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto">
             <Label Grid.Row="0" 
                    Grid.Column="0"
@@ -16,8 +16,8 @@
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Text="Invest"
-                    Margin="0,12,0,0"
-                    WidthRequest="150"
+                    Margin="0,10,0,0"
+                    WidthRequest="100"
                     HorizontalOptions="Start"
                     Command="{Binding ExecuteInvestCommand}"/>
             <Label Grid.Row="0"

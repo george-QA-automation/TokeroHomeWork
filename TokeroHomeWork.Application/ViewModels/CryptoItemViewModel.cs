@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.Controls;
@@ -23,17 +24,27 @@ namespace TokeroHomeWork.Application.ViewModels;
             var selectedDayOfMonth = 15;
             var investmentAmount = 100m;
 
-            var datePicker = new DatePicker { Date = selectedDate, Format = "D", Margin = new Thickness(0, 10) };
-            datePicker.DateSelected += (s, e) => { selectedDate = e.NewDate; };
-
             var dayPicker = new Picker
             {
                 Title = "Select day",
-                Margin = new Thickness(0, 10)
+                Margin = new Thickness(0, 10),
+                IsEnabled = false,
             };
-            dayPicker.Items.Add("15");
-            dayPicker.Items.Add("20");
-            dayPicker.Items.Add("25");
+            
+            var datePicker = new DatePicker { Date = selectedDate, Format = "D", Margin = new Thickness(0, 10) };
+            DateTime minDate = DateTime.Today.AddDays(-365);
+            datePicker.MinimumDate = minDate; //Due to demo API limitation, can only fetch data from 365 ago
+            datePicker.DateSelected += (s, e) =>
+            {
+                selectedDate = e.NewDate;
+                dayPicker.IsEnabled = true;
+                int remainingDaysInMonth = DateTime.DaysInMonth(selectedDate.Year, selectedDate.Month);
+                for (int i = selectedDate.Day; i <= remainingDaysInMonth; i++)
+                {
+                    dayPicker.Items.Add(i.ToString());
+                }
+            };
+            
             dayPicker.SelectedIndexChanged += (s, e) => 
             {
                 if (dayPicker.SelectedIndex >= 0)
