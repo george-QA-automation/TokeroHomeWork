@@ -39,11 +39,7 @@ public partial class HomePageViewModel : ObservableObject
             var tasks = CryptoList.Select(async crypto => 
             {
                 var price = await GetCurrentPriceAsync(crypto.ToLower(), "eur");
-                return new CryptoItemViewModel
-                {
-                    CryptoName = crypto,
-                    Value = price
-                };
+                return new CryptoItemViewModel(crypto, price);
             }).ToList();
 
             var results = await Task.WhenAll(tasks);
@@ -228,10 +224,10 @@ public partial class HomePageViewModel : ObservableObject
             {
                 var navigationParameters = new ShellNavigationQueryParameters
                 {
-                    {"selectedCoins", tcs.Task.Result.selectedCryptos},
-                    {"startDate", tcs.Task.Result.date},
-                    {"dayOfTheMonth", tcs.Task.Result.dayOfMonth},
-                    {"amountPerMonth", tcs.Task.Result.amount},
+                    {"selectedCoins", result.selectedCryptos},
+                    {"startDate", result.date},
+                    {"dayOfTheMonth", result.dayOfMonth},
+                    {"amountPerMonth", result.amount},
                 };
                 await Shell.Current.GoToAsync("//Portfolio", navigationParameters);
             }

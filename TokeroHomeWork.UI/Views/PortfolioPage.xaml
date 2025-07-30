@@ -10,7 +10,7 @@
              Shell.NavBarIsVisible="False"
              x:DataType="{x:Type viewModels:PortfolioViewModel}">
 <ScrollView>
-       <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto,*" 
+       <Grid RowDefinitions="Auto,Auto,Auto,Auto,1.2*,Auto,Auto,*" 
              Padding="10">
               <Label Grid.Row="0" 
                      Text="Portfolio" 
@@ -40,7 +40,7 @@
                      CornerRadius="10"
                      BorderColor="LightGray"
                      IsVisible="{Binding HasInvestmentRecords}">
-                     <Grid RowDefinitions="Auto,Auto,*"
+                     <Grid RowDefinitions="Auto,Auto,*,Auto,Auto"
                            ColumnDefinitions="*,0.8*">
                             <Label Grid.Row="0"
                                    Grid.Column="0"
@@ -81,6 +81,35 @@
                                                    Chart="{Binding PerformanceCompareChart}"
                                                    HeightRequest="250"
                                                    Opacity="0.5"/>
+                            <HorizontalStackLayout Grid.Column="0"
+                                                   Grid.Row="3"
+                                                   HorizontalOptions="Start">
+                                   <BoxView WidthRequest="10" 
+                                            HeightRequest="10" 
+                                            Color="#3498db" 
+                                            Margin="0,0,5,0"/>
+                                   <Label Text="Bitcoin" 
+                                          FontSize="10"/>
+                            </HorizontalStackLayout>
+                            <CollectionView Grid.Column="0"
+                                   Grid.ColumnSpan="2"
+                                   Grid.Row="3"
+                                   HorizontalOptions="Start"
+                                   ItemsSource="{Binding SelectedCoins}"
+                                   ItemsLayout="HorizontalList"
+                                   IsVisible="{Binding IsCompare}">
+                                   <CollectionView.ItemTemplate>
+                                          <DataTemplate>
+                                                 <HorizontalStackLayout>
+                                                        <BoxView WidthRequest="10" 
+                                                                 HeightRequest="10" 
+                                                                 Color="{Binding ., Converter={converters:CryptoColorConverter}}" />
+                                                        <Label Text="{Binding .}" 
+                                                               FontSize="10"/>
+                                                 </HorizontalStackLayout>
+                                          </DataTemplate>
+                                   </CollectionView.ItemTemplate>
+                            </CollectionView>
                      </Grid>
               </Frame>
               <Label Grid.Row="3"
@@ -144,11 +173,8 @@
                      CornerRadius="10"
                      BorderColor="LightGray"
                      IsVisible="{Binding HasInvestmentRecords}">
-                     <Grid RowDefinitions="*">
-                            <microcharts:ChartView Grid.Row="2"
-                                                   Chart="{Binding DonutChart}"
-                                                   HeightRequest="250"/>
-                     </Grid>
+                     <microcharts:ChartView Chart="{Binding DonutChart}"
+                                            HeightRequest="250"/>
               </Frame>
               <Label Grid.Row="6"
                      Text="Monthly recap"
@@ -225,7 +251,7 @@
                      </ListView.ItemTemplate>
               </ListView>
               
-              <!-- Empty View / Loading -->
+              <!-- Empty View & Loading -->
               <Label Grid.Row="5"
                      Text="No investments yet"
                      FontSize="16"
@@ -233,7 +259,7 @@
                      HorizontalOptions="Center"
                      VerticalOptions="Center"
                      IsVisible="{Binding HasInvestmentRecords, Converter={converters:NotConverter}}"
-                     Margin="10">
+                     Margin="20">
                      <Label.Triggers>
                             <DataTrigger TargetType="Label"
                                          Binding="{Binding IsLoading, Mode=OneWay}"

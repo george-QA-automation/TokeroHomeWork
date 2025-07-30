@@ -1,19 +1,14 @@
-using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Maui.Controls;
-using TokeroHomeWork.Application.ViewModels;
 
 namespace TokeroHomeWork.Application.ViewModels;
     
     public partial class CryptoItemViewModel : ObservableObject
     {
-        public CryptoItemViewModel()
+        public CryptoItemViewModel(string cryptoName, decimal? value)
         {
-            
+            CryptoName = cryptoName;
+            Value = value;
         }
 
         [RelayCommand]

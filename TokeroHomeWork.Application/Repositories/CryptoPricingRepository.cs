@@ -18,7 +18,6 @@ namespace TokeroHomeWork.Application.Repositories
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _httpClient.Timeout = TimeSpan.FromSeconds(15);
-
         }
 
         public async Task<decimal> GetHistoricalPriceAsync(string coinId, DateTime date)
