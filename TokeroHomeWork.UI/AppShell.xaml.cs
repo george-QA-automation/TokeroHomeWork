@@ -8,7 +8,7 @@ public partial class AppShell : Shell
         
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            await GoToAsync("//HomePage");
+            await GoToAsync("//Login");
         });
     }
 }

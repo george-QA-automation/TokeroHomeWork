@@ -18,5 +18,8 @@
                 Route="Portfolio" />
         </Tab>
     </TabBar>
+    
+    <ShellContent ContentTemplate="{DataTemplate views:LoginPage}"
+                  Route="Login"/>
 
 </Shell>

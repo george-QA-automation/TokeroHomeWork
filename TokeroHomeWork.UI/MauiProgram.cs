@@ -26,7 +26,9 @@ public static class MauiProgram
         
         builder.Services.AddTransient<PortfolioPage>();
         builder.Services.AddTransient<HomePage>();
-        
+        builder.Services.AddTransient<LoginPage>();
+
+        builder.Services.AddTransient<LoginPageViewModel>();
         builder.Services.AddTransient<PortfolioViewModel>();
         builder.Services.AddTransient<HomePageViewModel>();
 
