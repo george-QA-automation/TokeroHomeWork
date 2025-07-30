@@ -11,7 +11,7 @@
              x:DataType="{x:Type viewModels:PortfolioViewModel}">
 <ScrollView>
        <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto,*" 
-             Padding="20">
+             Padding="10">
               <Label Grid.Row="0" 
                      Text="Portfolio" 
                      FontSize="24" 
@@ -27,7 +27,7 @@
               <Image Grid.Row="1"
                      Source="clear"
                       Margin="0,0,0,10"
-                      WidthRequest="60"
+                      WidthRequest="20"
                       HeightRequest="20"
                       HorizontalOptions="End"
                       IsVisible="{Binding HasInvestmentRecords}">
@@ -37,26 +37,50 @@
               </Image>
               <Frame Grid.Row="2" 
                      Margin="0,0,0,20"
-                     Padding="10"
                      CornerRadius="10"
                      BorderColor="LightGray"
                      IsVisible="{Binding HasInvestmentRecords}">
-                     <Grid RowDefinitions="Auto,Auto,*">
+                     <Grid RowDefinitions="Auto,Auto,*"
+                           ColumnDefinitions="*,0.8*">
                             <Label Grid.Row="0"
-                                   Text="{Binding PortfolioChartTitle}" 
+                                   Grid.Column="0"
+                                   Text="{Binding PortfolioChartInvestment}" 
                                    FontSize="14" 
                                    FontAttributes="Bold" 
-                                   HorizontalOptions="Start"
-                                   Margin="10,0,0,0"/>
+                                   HorizontalOptions="Start"/>
                             <Label Grid.Row="1"
-                                   Text="{Binding PortfolioChartSubtitle}"
+                                   Grid.Column="0"
+                                   Text="{Binding PortfolioChartValue}"
                                    FontSize="14"
                                    FontAttributes="Bold"
-                                   HorizontalOptions="Start"
-                                   Margin="10"/>
+                                   HorizontalOptions="Start"/>
+                            <Label Grid.Row="0"
+                                   Grid.Column="1"
+                                   Text="{Binding PortfolioChartROI}"
+                                   FontSize="14"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="End"/>
+                            <Label Grid.Row="1"
+                                   Grid.Column="1"
+                                   Text="Compare with"
+                                   TextColor="BlueViolet"
+                                   FontSize="10"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="End">
+                                   <Label.GestureRecognizers>
+                                          <TapGestureRecognizer Command="{Binding CompareWithCommand}"/>
+                                   </Label.GestureRecognizers>
+                            </Label>
                             <microcharts:ChartView Grid.Row="2"
+                                                   Grid.ColumnSpan="2"
                                                    Chart="{Binding PerformanceChart}"
                                                    HeightRequest="250"/>
+                            <microcharts:ChartView Grid.Row="2"
+                                                   Grid.ColumnSpan="2"
+                                                   IsVisible="{Binding IsCompare}"
+                                                   Chart="{Binding PerformanceCompareChart}"
+                                                   HeightRequest="250"
+                                                   Opacity="0.5"/>
                      </Grid>
               </Frame>
               <Label Grid.Row="3"
@@ -71,8 +95,7 @@
                         IsVisible="{Binding HasInvestmentRecords}"
                         Margin="0,0,0,20">
                      <ListView.Header>
-                            <Grid ColumnDefinitions="*,*,1.2*,1.2*" 
-                                  Padding="5">
+                            <Grid ColumnDefinitions="*,*,1.2*,1.2*">
                                    <Label Grid.Column="0" 
                                           Text="Name" 
                                           FontAttributes="Bold" 
@@ -93,7 +116,7 @@
                      </ListView.Header>
                      <ListView.ItemTemplate>
                             <DataTemplate x:DataType="models:CryptoSummary">
-                                   <ViewCell Height="70">
+                                   <ViewCell>
                                           <Grid ColumnDefinitions="*,*,1.2*,1.2*" 
                                                 Padding="10">
                                                  <Label Grid.Column="0"
