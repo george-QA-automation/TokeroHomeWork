@@ -112,6 +112,12 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
 
         while (currentStartDate <= today)
         {
+            var daysInMonth = DateTime.DaysInMonth(currentStartDate.Year, currentStartDate.Month);
+            currentStartDate = currentStartDate.Day >= daysInMonth 
+                ? new DateTime(currentStartDate.Year, currentStartDate.Month, daysInMonth) 
+                : new DateTime(currentStartDate.Year, currentStartDate.Month, dayOfMonth);
+            
+            
             var historicalPrice = await GetHistoricalPriceAsync(cryptoName, currentStartDate);
             var cryptoAmount = CalculateCryptoAmount(amount, historicalPrice);
             var roi = CalculateROI(amount, cryptoAmount, currentValue.Value);
@@ -190,7 +196,6 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
             
             CryptoSummaries.Add(summary);
         }
-
     }
 
     private decimal CalculateCryptoAmount(decimal investedAmount, decimal? value)
@@ -267,8 +272,8 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
             totalPotfolioInvestment += coin.InvestedAmount;
         }
         TotalROI = (totalPortfolioValue - totalPotfolioInvestment) / totalPotfolioInvestment * 100;
-        PortfolioChartTitle = $"Total value: {totalPortfolioValue:N2} €  Total investment: {totalPotfolioInvestment:N2} €";
-        PortfolioChartSubtitle = $"ROI: {TotalROI:F2}%";
+        PortfolioChartTitle = $"Total investment: {totalPotfolioInvestment:N2} €";
+        PortfolioChartSubtitle = $"Total value: {{totalPortfolioValue:N2}} €  ROI: {{TotalROI:F2}}%";
 
         var newChart = new LineChart
         {
