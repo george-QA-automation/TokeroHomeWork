@@ -16,7 +16,7 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
     public ObservableCollection<InvestmentRecord> ProcessedInvestmentRecords { get; } = new();
     public ObservableCollection<InvestmentRecord> CompareProcessedInvestmentRecords { get; } = new();
     public ObservableCollection<CryptoSummary> CryptoSummaries { get; } = new();
-    public List<string> SelectedCoins { get; } = new();
+    public ObservableCollection<string> SelectedCoins { get; } = new();
     private List<string> CryptoList = new()
     { 
         "Bitcoin", 
@@ -235,7 +235,6 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
         if (result.confirmed)
         {
             IsCompare = true;
-            await Shell.Current.Navigation.PopModalAsync();
             foreach (var coin in selectedCryptos)
             {
                 var valueToday = await GetCurrentPriceAsync(coin.ToLower(), "eur");
@@ -245,6 +244,7 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
                 PerformanceCompareChart = GeneratePerformanceChart(CompareProcessedInvestmentRecords, color);
                 SelectedCoins.Add(coin);
             }
+            await Shell.Current.Navigation.PopModalAsync();
         }
     }
 
@@ -288,7 +288,12 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
 
     private void CalculatePortfolioProgress(ObservableCollection<InvestmentRecord> investmentRecords)
     {
-        ProcessedInvestmentRecords.Clear();
+        //Ensure keeping ProcessedInvestmentRecords when user compares with another coin
+        if (!IsCompare)
+        {
+            ProcessedInvestmentRecords.Clear();
+        }
+        
         var groupedRecords = investmentRecords.GroupBy(r => r.CryptoName).ToList();
         ObservableCollection<InvestmentRecord> newRecords = new();
 

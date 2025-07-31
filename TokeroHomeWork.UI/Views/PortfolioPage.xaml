@@ -10,7 +10,7 @@
              Shell.NavBarIsVisible="False"
              x:DataType="{x:Type viewModels:PortfolioViewModel}">
 <ScrollView>
-       <Grid RowDefinitions="Auto,Auto,Auto,Auto,1.2*,Auto,Auto,*" 
+       <Grid RowDefinitions="Auto,Auto,*,Auto,1.2*,Auto,Auto,*" 
              Padding="10">
               <Label Grid.Row="0" 
                      Text="Portfolio" 
@@ -92,18 +92,17 @@
                                           FontSize="10"/>
                             </HorizontalStackLayout>
                             <CollectionView Grid.Column="0"
-                                   Grid.ColumnSpan="2"
-                                   Grid.Row="3"
+                                   Grid.Row="4"
                                    HorizontalOptions="Start"
                                    ItemsSource="{Binding SelectedCoins}"
-                                   ItemsLayout="HorizontalList"
-                                   IsVisible="{Binding IsCompare}">
+                                   ItemsLayout="HorizontalList">
                                    <CollectionView.ItemTemplate>
                                           <DataTemplate>
                                                  <HorizontalStackLayout>
                                                         <BoxView WidthRequest="10" 
                                                                  HeightRequest="10" 
-                                                                 Color="{Binding ., Converter={converters:CryptoColorConverter}}" />
+                                                                 Color="{Binding ., Converter={converters:CryptoColorConverter}}" 
+                                                                 Margin="0,0,5,0"/>
                                                         <Label Text="{Binding .}" 
                                                                FontSize="10"/>
                                                  </HorizontalStackLayout>
