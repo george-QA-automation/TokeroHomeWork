@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using TokeroHomeWork.Application.Interfaces;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Shapes;
+using TokeroHomeWork.Application.Constants;
 
 namespace TokeroHomeWork.Application.ViewModels;
 
@@ -12,16 +13,6 @@ public partial class HomePageViewModel : ObservableObject
 {
     private readonly ICryptoPricingRepository _cryptoPricingRepository;
     public ObservableCollection<CryptoItemViewModel> CryptoItems { get; } = new();
-    private List<string> CryptoList = new()
-    { 
-        "Bitcoin", 
-        "Ethereum", 
-        "Solana", 
-        "Cardano", 
-        "Tether", 
-        "Dogecoin", 
-        "Tron" 
-    };
 
     public HomePageViewModel(ICryptoPricingRepository cryptoPricingRepository)
     {
@@ -36,7 +27,7 @@ public partial class HomePageViewModel : ObservableObject
         {
             IsLoading = true;
 
-            var tasks = CryptoList.Select(async crypto => 
+            var tasks = CryptoConstants.CryptoList.Select(async crypto => 
             {
                 var price = await GetCurrentPriceAsync(crypto.ToLower(), "eur");
                 return new CryptoItemViewModel(crypto, price);
@@ -109,7 +100,7 @@ public partial class HomePageViewModel : ObservableObject
 
             var cryptoSelectionStack = new StackLayout { Spacing = 10, Margin = new Thickness(0, 10) };
 
-            foreach (var cryptoName in CryptoList)
+            foreach (var cryptoName in CryptoConstants.CryptoList)
             {
                 var crypto = CryptoItems.FirstOrDefault(c => c.CryptoName == cryptoName);
                 var price = crypto?.Value ?? 0;

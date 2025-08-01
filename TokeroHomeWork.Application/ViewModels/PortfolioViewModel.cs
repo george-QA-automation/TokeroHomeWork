@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microcharts;
 using SkiaSharp;
+using TokeroHomeWork.Application.Constants;
 using TokeroHomeWork.Application.Interfaces;
 using TokeroHomeWork.Application.Models;
 
@@ -16,29 +17,8 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
     public ObservableCollection<InvestmentRecord> ProcessedInvestmentRecords { get; } = new();
     public ObservableCollection<InvestmentRecord> CompareProcessedInvestmentRecords { get; } = new();
     public ObservableCollection<CryptoSummary> CryptoSummaries { get; } = new();
-    public ObservableCollection<string> SelectedCoins { get; } = new();
-    private List<string> CryptoList = new()
-    { 
-        "Bitcoin", 
-        "Ethereum", 
-        "Solana", 
-        "Cardano", 
-        "Tether", 
-        "Dogecoin", 
-        "Tron" 
-    };
-
-    private Dictionary<string, SKColor> CryptoColors = new()
-    {
-        { "bitcoin", SKColor.Parse("#F7931A") },   // Orange
-        { "ethereum", SKColor.Parse("#800080") },  // Purple
-        { "solana", SKColor.Parse("#00FFA3") },    // Green
-        { "cardano", SKColor.Parse("#0033AD") },   // Navy Blue
-        { "tether", SKColor.Parse("#26A17B") },    // Teal
-        { "dogecoin", SKColor.Parse("#C2A633") },  // Gold
-        { "tron", SKColor.Parse("#EF0027") }       // Red
-    };
-
+    public ObservableCollection<CompareWithItemInfo> SelectedCoins { get; } = new();
+    
     public PortfolioViewModel(ICryptoPricingRepository cryptoPricingRepository)
     {
         _cryptoPricingRepository = cryptoPricingRepository;
@@ -72,7 +52,6 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
                     {
                         InvestmentRecords.Add(record);
                     }
-
                     PerformanceChartLegend += $"{CryptoName} ";
                 }
 
@@ -95,7 +74,6 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
                         {
                             InvestmentRecords.Add(record);
                         }
-                        
                         PerformanceChartLegend += $"{coin} ";
                     }
                 }
@@ -120,6 +98,8 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
     {
         InvestmentRecords.Clear();
         ProcessedInvestmentRecords.Clear();
+        CompareProcessedInvestmentRecords.Clear();
+        SelectedCoins.Clear();
         HasInvestmentRecords = false;
         IsCompare = false;
         PerformanceChart = null;
@@ -134,7 +114,7 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
         var selectedCryptoName = "";
         var selectedCryptos = new List<string>();
         var cryptoSelectionStack = new StackLayout { Spacing = 10, Margin = new Thickness(0, 10) };
-        foreach (var cryptoName in CryptoList)
+        foreach (var cryptoName in CryptoConstants.CryptoList)
         {
             var horizontalLayout = new HorizontalStackLayout { VerticalOptions = LayoutOptions.Center };
             var checkBox = new CheckBox
@@ -145,12 +125,9 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
             
             checkBox.CheckedChanged += (s, e) =>
             {
-                if (checkBox.IsChecked)
+                if (checkBox.IsChecked && !selectedCryptos.Contains(cryptoName))
                 {
-                    if (!selectedCryptos.Contains(cryptoName))
-                    {
-                        selectedCryptos.Add(cryptoName);
-                    }
+                    selectedCryptos.Add(cryptoName);
                 }
                 else
                 {
@@ -160,7 +137,6 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
 
             horizontalLayout.Children.Add(checkBox);
             horizontalLayout.Children.Add(cryptoLabel);
-            
             cryptoSelectionStack.Children.Add(horizontalLayout);
         }
         
@@ -222,8 +198,8 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
         selectButton.Clicked += async (s, e) =>
         {
             tcs.SetResult((true, selectedCryptos));
+            await Shell.Current.Navigation.PopModalAsync();
         };
-
         cancelButton.Clicked += async (s, e) =>
         {
             tcs.SetResult((false, new List<string>()));
@@ -231,7 +207,6 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
         };
 
         var result = await tcs.Task;
-        
         if (result.confirmed)
         {
             IsCompare = true;
@@ -240,11 +215,14 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
                 var valueToday = await GetCurrentPriceAsync(coin.ToLower(), "eur");
                 var records = await SetInvestmentRecords(coin, StartDate, DayOfMonth, AmountPerMonth, valueToday);
                 CalculatePortfolioProgress(records);
-                var color = CryptoColors[coin.ToLower()];
+                var color = CryptoConstants.CryptoColors[coin.ToLower()];
                 PerformanceCompareChart = GeneratePerformanceChart(CompareProcessedInvestmentRecords, color);
-                SelectedCoins.Add(coin);
+                SelectedCoins.Add(new CompareWithItemInfo
+                {
+                    CryptoName = coin, 
+                    CryptoPrice = CompareProcessedInvestmentRecords.Last().ValueToday
+                });
             }
-            await Shell.Current.Navigation.PopModalAsync();
         }
     }
 
@@ -252,13 +230,12 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
     {
         DateTime currentStartDate = new DateTime(startDate.Year, startDate.Month, dayOfMonth);
         DateTime today = DateTime.Today;
-
         ObservableCollection<InvestmentRecord> records = new();
 
         while (currentStartDate <= today)
         {
             //Set day of month according to number of days in each month
-            //examle: if user selects the 30th for investment, set 28 for february
+            //example: if user selects the 30th for investment, set 28 for february
             var daysInMonth = DateTime.DaysInMonth(currentStartDate.Year, currentStartDate.Month);
             currentStartDate = currentStartDate.Day >= daysInMonth 
                 ? new DateTime(currentStartDate.Year, currentStartDate.Month, daysInMonth) 
@@ -274,15 +251,13 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
                 CryptoName = cryptoName,
                 InvestedAmount = amount,
                 CryptoAmount = cryptoAmount,
-                CryptoValue = historicalPrice,
-                ValueToday = currentValue.Value,
+                CryptoPrice = historicalPrice,
+                PriceToday = currentValue.Value,
                 ROI = roi
             };
-
             records.Add(investmentRecord);
             currentStartDate = currentStartDate.AddMonths(1);
         }
-        
         return records;
     }
 
@@ -295,8 +270,6 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
         }
         
         var groupedRecords = investmentRecords.GroupBy(r => r.CryptoName).ToList();
-        ObservableCollection<InvestmentRecord> newRecords = new();
-
         foreach (var groupedRecord in groupedRecords)
         {
             var acumulatedCrypto = 0m;
@@ -311,9 +284,10 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
                     CryptoName = record.CryptoName,
                     InvestedAmount = acumulatedInvestment,
                     CryptoAmount = acumulatedCrypto,
-                    CryptoValue = record.CryptoValue,
-                    ValueToday = record.ValueToday,
-                    ROI = CalculateROI(acumulatedInvestment, acumulatedCrypto, record.CryptoValue)
+                    MonthlyValue = acumulatedCrypto * record.CryptoPrice,
+                    CryptoPrice = record.CryptoPrice,
+                    PriceToday = record.PriceToday,
+                    ROI = CalculateROI(acumulatedInvestment, acumulatedCrypto, record.CryptoPrice)
                 };
                 if (!IsCompare)
                 {
@@ -323,7 +297,6 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
                 {
                     CompareProcessedInvestmentRecords.Add(investmentRecord);   
                 }
-                
             }
         }
     }
@@ -331,7 +304,6 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
     private async Task CalculateCryptoSummary()
     {
         CryptoSummaries.Clear();
-    
         var cryptoGroups = ProcessedInvestmentRecords
             .GroupBy(r => r.CryptoName)
             .Select(group => group.OrderBy(r => r.Date).Last())
@@ -347,10 +319,9 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
             {
                 CryptoName = crypto.CryptoName,
                 Amount = crypto.CryptoAmount,
-                TotalValue = crypto.CryptoAmount * crypto.ValueToday,
+                TotalValue = crypto.CryptoAmount * crypto.PriceToday,
                 AmountInBTC = amountInBtc
             };
-            
             CryptoSummaries.Add(summary);
         }
     }
@@ -377,6 +348,7 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
         };
         var emptyEntry = new ChartEntry(0)
         {
+            Label = investmentRecords.First().Date.AddMonths(-1).ToString("MMM"),
             Color = lineColorHex,
             TextColor = lineColorHex
         };
@@ -390,6 +362,7 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
         var totalPortfolioValue = 0m;
         var totalPotfolioInvestment = 0m;
         var groupTotalValue = 0m;
+        var maxChartValue = 0f;
         
         foreach (var group in groupedRecords)
         {
@@ -397,27 +370,30 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
             
             foreach (var cryptoGroup in cryptoGroups)
             {
-                decimal cryptoValue = cryptoGroup.Sum(r => r.CryptoAmount * r.CryptoValue);
+                decimal cryptoValue = cryptoGroup.Sum(r => r.CryptoAmount * r.CryptoPrice);
         
                 groupTotalValue += cryptoValue;
             }
             
             var entry = new ChartEntry((float)groupTotalValue)
             {
+                Label = group.First().Date.ToString("MMM") ,
                 Color = lineColorHex,
                 TextColor = lineColorHex
             };
+            maxChartValue = (float)groupTotalValue > maxChartValue ? (float)groupTotalValue : maxChartValue;
             groupTotalValue = 0;
             entries.Add(entry);
         }
         
-        var lastRecordPerCoin = ProcessedInvestmentRecords
+        var lastRecordPerCoin = investmentRecords
             .GroupBy(r => r.CryptoName)
             .Select(group => group.OrderBy(r => r.Date).Last())
             .ToList();
         foreach (var coin in lastRecordPerCoin)
         {
-            totalPortfolioValue += coin.CryptoAmount * coin.ValueToday;
+            totalPortfolioValue += coin.CryptoAmount * coin.PriceToday;
+            coin.ValueToday = coin.CryptoAmount * coin.PriceToday;
             totalPotfolioInvestment += coin.InvestedAmount;
         }
 
@@ -434,16 +410,16 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
         {
             Entries = entries,
             LineMode = LineMode.Spline,
-            LineSize = 4,
+            LineSize = 6,
             PointMode = PointMode.Circle,
             PointSize = 10,
-            LabelTextSize = 30,
+            LabelTextSize = 16,
             LabelOrientation = Orientation.Horizontal,
             ValueLabelOrientation = Orientation.Horizontal,
             BackgroundColor = SKColors.Empty,
             LineAreaAlpha = 0,
             MinValue = 0,
-            MaxValue = (float)totalPortfolioValue * 0.5f,
+            MaxValue = maxChartValue * 1.5f,
             IsAnimated = false,
             ShowYAxisLines = false,
             ShowYAxisText = false,
@@ -463,8 +439,8 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
 
         foreach (var coin in lastRecordPerCoin)
         {
-            var coinValueToday = coin.CryptoAmount * coin.ValueToday;
-            var color = CryptoColors[coin.CryptoName.ToLower()];
+            var coinValueToday = coin.CryptoAmount * coin.PriceToday;
+            var color = CryptoConstants.CryptoColors[coin.CryptoName.ToLower()];
             var entry = new ChartEntry((float)coinValueToday)
             {
                 Label = coin.CryptoName,
@@ -546,4 +522,7 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
 
     [ObservableProperty] 
     private string _performanceChartLegend;
+
+    [ObservableProperty] 
+    private List<string> _passedSelectedCoins;
 }

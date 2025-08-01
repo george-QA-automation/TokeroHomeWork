@@ -7,12 +7,15 @@
     Shell.NavBarIsVisible="True">
 
     <TabBar>
-        <Tab Icon="home">
+        <Tab Icon="home"
+             Title="Watchlist">
             <ShellContent
                 ContentTemplate="{DataTemplate views:HomePage}"
-                Route="HomePage" />
+                Route="HomePage" 
+                />
         </Tab>
-        <Tab Icon="portfolio">
+        <Tab Icon="portfolio"
+             Title="Portfolio">
             <ShellContent
                 ContentTemplate="{DataTemplate views:PortfolioPage}"
                 Route="Portfolio" />
