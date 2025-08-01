@@ -105,6 +105,7 @@ public partial class PortfolioViewModel : ObservableObject, IQueryAttributable
         PerformanceChart = null;
         PerformanceCompareChart = null;
         DonutChart = null;
+        PerformanceChartLegend = "";
     }
 
     [RelayCommand]

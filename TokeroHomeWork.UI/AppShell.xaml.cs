@@ -1,4 +1,6 @@
-﻿namespace TokeroHomeWork;
+﻿using TokeroHomeWork.Constants;
+
+namespace TokeroHomeWork;
 
 public partial class AppShell : Shell
 {
@@ -8,7 +10,25 @@ public partial class AppShell : Shell
         
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            await GoToAsync("//Login");
+            if (IsLoggedIn())
+            {
+                await GoToAsync("//HomePage");
+            }
+            else
+            {
+                MarkAsLoggedIn();
+                await GoToAsync("//Login");
+            }
         });
+        
+        bool IsLoggedIn()
+        {
+            return Preferences.Get(AppConstants.IsLoggedIn, "false") == "true";
+        }
+        
+        void MarkAsLoggedIn()
+        {
+            Preferences.Set(AppConstants.IsLoggedIn, "true");
+        }
     }
 }
